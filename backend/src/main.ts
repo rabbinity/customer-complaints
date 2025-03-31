@@ -5,9 +5,8 @@ import logger from "morgan";
 
 // loute imports 😭
 import userRouter from "./User/router";
-import appRouter from "./app/router";
-import wareHousestoreRouter from "./app/wareHousestore";
-import storeSalesInventoryRouter from "./app/storeSalesInventory";
+import router from "./app/application_handler";
+
 
 const app: Express = express();
 
@@ -30,12 +29,11 @@ app.options('*', cors(corsOptions));  // Handle OPTIONS for all routes
 
 // routes 😂
 app.use("/api/user", userRouter);
-app.use("/api/A", appRouter);
-app.use("/wareHousestore", wareHousestoreRouter);
-app.use( storeSalesInventoryRouter);
+app.use("/api/A", router);
+
 app.get("/", (req: Request, res: Response) => {
   console.log(req.body);
-  res.json("Api xcx Running 18:sddf");
+  res.json("Api xcx Running customer complaints");
 }); 
 
 app.listen(process.env.PORT, () => {

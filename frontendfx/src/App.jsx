@@ -1,100 +1,100 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { RecoilRoot } from 'recoil';
-import Register from './auth/Register.jsx';
-import { ForgotPassword } from './auth/Forgot_password.jsx';
-import { Login } from './auth/Login.jsx';
-import { ProfileUpdate } from './auth/Profilemanagement.jsx';
-import UpdatePassword from './auth/Update_password.jsx';
-import EmailVerification from './auth/EmailVerification.jsx';
+import  { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import CreateComplaint from '../src/app/components/CreateComplaint';
+import ComplaintsList from '../src/app/components/ComplaintsList';
+import ComplaintDetail from '../src/app/components/ComplaintDetail';
+import { RecoilRoot, useRecoilState } from 'recoil';
+import { userStates } from './atoms';
 
-import Sidebar from "./app/components/common/Sidebar.jsx";
-import MobileWarningPopup from './app/components/common/mboileView.jsx';
-import { Outlet } from 'react-router-dom';
-import Dashboard from './app/customer/Dashboard.jsx';
-import MyComplaints from './app/customer/MyComplaints.jsx';
-import NewComplaint from './app/customer/NewComplaint.jsx';
+const MainApp = () => {
+  const [user, setUser] = useRecoilState(userStates);
 
-// Staff/Admin Layout
-function StaffLayout() {
+  useEffect(() => {
+    if (!user.userId) {
+      setUser({
+        userId: 1,
+        username: 'johndoe',
+        role: 'user',
+        lastame: null,
+        midlename: null,
+        email: null,
+        phoneNumber: null,
+        group: null,
+        token: null,
+        isEmailVerified: null,
+        bloodGroup: null,
+        address: null,
+        dateOfBirth: null,
+        gender: null,
+        emergencyContact: null,
+        nrc_card_id: null,
+      });
+    }
+  }, [user, setUser]);
+
+  const toggleUserRole = () => {
+    setUser((prev) => ({
+      ...prev,
+      role: prev.role === 'admin' ? 'user' : 'admin',
+    }));
+  };
+
+  const isAdmin = user.role === 'admin';
+
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
-        <div className="absolute inset-0 backdrop-blur-sm" />
-      </div>
-      
-      {/* Sidebar */}
-      <MobileWarningPopup />
-      <Sidebar />
-      
-      {/* Content */}
-      <div className="flex-1 overflow-auto p-4">
-        <Outlet />
-      </div>
-    </div>
-  );
-}
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <nav className="bg-white shadow-md">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex justify-between h-16">
+              <div className="flex">
+                <div className="flex-shrink-0 flex items-center">
+                  <span className="text-xl font-bold text-blue-600">Complaint System</span>
+                </div>
+                <div className="ml-10 flex items-center space-x-4">
+                  <Link to="/" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    Dashboard
+                  </Link>
+                  <Link to="/complaints" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    Complaints
+                  </Link>
+                  <Link to="/create" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    New Complaint
+                  </Link>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className="mr-4">
+                  Welcome, {user.username} ({isAdmin ? 'Admin' : 'User'})
+                </span>
+                <button 
+                  onClick={toggleUserRole}
+                  className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition-colors text-sm"
+                >
+                  Switch to {isAdmin ? 'User' : 'Admin'} Role
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
 
-// Customer Layout
-function CustomerLayout() {
-  return (
-    <div className="flex h-screen bg-blue-900 text-gray-100 overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 -z-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 opacity-80" />
-        <div className="absolute inset-0 backdrop-blur-sm" />
+        <main className="max-w-6xl mx-auto px-4 py-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/complaints" />} />
+            <Route path="/complaints" element={<ComplaintsList />} />
+            <Route path="/create" element={<CreateComplaint />} />
+            <Route path="/complaints/:id" element={<ComplaintDetail />} />
+          </Routes>
+        </main>
       </div>
-      
-      {/* Sidebar */}
-      <MobileWarningPopup />
-      <Sidebar />
-      
-      {/* Content */}
-      <div className="flex-1 overflow-auto p-4">
-        <Outlet />
-      </div>
-    </div>
+    </Router>
   );
-}
+};
 
-function App() {
-  return (
-    <RecoilRoot>
-      <BrowserRouter>
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/update/password" element={<UpdatePassword />} />
-          <Route path="/verify/email/:token" element={<EmailVerification />} />
-          
-          {/* Staff/Admin Routes - Company Workers */}
-          <Route path="/staff" element={<StaffLayout />}>
-            <Route index element={<div>Staff Dashboard</div>} />
-            <Route path="complaints" element={<div>All Complaints</div>} />
-            <Route path="complaints/:id" element={<div>Complaint Details</div>} />
-            <Route path="users" element={<div>Users Management</div>} />
-            <Route path="settings" element={<div>Settings</div>} />
-            <Route path="profile" element={<ProfileUpdate />} />
-          </Route>
-          
-          {/* Customer Routes */}
-          <Route path="/" element={<CustomerLayout />}>
-            <Route index element={<Dashboard/>} />
-            <Route path="my-complaints" element={<MyComplaints />}/>
-            <Route path="my-complaints/:id" element={<MyComplaints />} />
-            <Route path="new-complaint" element={<NewComplaint/>} />
-            <Route path="profile" element={<ProfileUpdate />} />
-          </Route>
-          
-          {/* Redirect unknown paths to login */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </RecoilRoot>
-  );
-}
+const App = () => (
+  <RecoilRoot>
+    <MainApp />
+  </RecoilRoot>
+);
 
 export default App;

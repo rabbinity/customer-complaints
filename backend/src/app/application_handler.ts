@@ -1,15 +1,17 @@
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { prisma } from "../../config/db";
 import { StatusCodes } from "http-status-codes";
 import { sendMail } from "../../utils/mail";
 
+// Initialize router
+const router = Router();
 
 /**
  * Create a new complaint.
  * Optionally, a product name can be appended to the subject.
  * Also accepts an optional "image" string.
  */
-export const createComplaint = async (req: Request, res: Response) => {
+const createComplaint = async (req: Request, res: Response) => {
   try {
     const { userId, subject, description, productName, image } = req.body;
     const finalSubject = productName ? `${subject} - Product: ${productName}` : subject;
@@ -19,7 +21,7 @@ export const createComplaint = async (req: Request, res: Response) => {
         userId,
         subject: finalSubject,
         description,
-        image, // Added image field
+        image, // optional image field
       },
     });
 
@@ -58,11 +60,27 @@ export const createComplaint = async (req: Request, res: Response) => {
 };
 
 /**
+ * Get all complaints along with their follow-up notes.
+ * For regular users, the client can filter by userId.
+ */
+const getAllComplaints = async (_req: Request, res: Response) => {
+  try {
+    const complaints = await prisma.complaint.findMany({
+      include: { followUps: true },
+    });
+    return res.status(StatusCodes.OK).json(complaints);
+  } catch (error) {
+    console.error(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Error fetching complaints" });
+  }
+};
+
+/**
  * Assign a follow-up agent to the complaint and record the initial review note.
  * The assigned user (agent) is identified by reviewerUserId.
  * Sends an email to the complainer informing that the complaint is under review.
  */
-export const assignComplaint = async (req: Request, res: Response) => {
+const assignComplaint = async (req: Request, res: Response) => {
   try {
     const complaintId = parseInt(req.params.id);
     const { reviewerName, reviewerUserId } = req.body;
@@ -119,11 +137,11 @@ export const assignComplaint = async (req: Request, res: Response) => {
 };
 
 /**
- * Add or update a follow-up note on a complaint.
- * This endpoint allows the assigned follow-up agent to update notes at each stage.
+ * Add a follow-up note on a complaint.
+ * This endpoint allows the assigned follow-up agent to add notes at each stage.
  * It sends an email notification to the complainer with the new note.
  */
-export const addFollowUpNote = async (req: Request, res: Response) => {
+const addFollowUpNote = async (req: Request, res: Response) => {
   try {
     const complaintId = parseInt(req.params.id);
     const { reviewerUserId, note } = req.body;
@@ -182,10 +200,10 @@ export const addFollowUpNote = async (req: Request, res: Response) => {
  * This endpoint allows the assigned follow-up agent to update the complaint's status
  * (for example, RESOLVED or CLOSED) and sends an email notification accordingly.
  */
-export const updateComplaintStatus = async (req: Request, res: Response) => {
+const updateComplaintStatus = async (req: Request, res: Response) => {
   try {
     const complaintId = parseInt(req.params.id);
-    const { status, reviewerUserId } = req.body; // status should be one of ComplaintStatus values
+    const { status, reviewerUserId } = req.body; // status should be one of: PENDING, IN_PROGRESS, RESOLVED, CLOSED
 
     if (!["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"].includes(status)) {
       return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid complaint status" });
@@ -224,7 +242,6 @@ export const updateComplaintStatus = async (req: Request, res: Response) => {
           </p>
         </div>
       `;
-      // If the complaint is RESOLVED or CLOSED, adjust the messaging.
       if (status === "RESOLVED" || status === "CLOSED") {
         emailSubject = "Your Complaint Has Been Resolved";
         emailHTML = `
@@ -259,17 +276,11 @@ export const updateComplaintStatus = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Get all complaints along with their follow-up notes.
- */
-export const getAllComplaints = async (req: Request, res: Response) => {
-  try {
-    const complaints = await prisma.complaint.findMany({
-      include: { followUps: true },
-    });
-    return res.status(StatusCodes.OK).json(complaints);
-  } catch (error) {
-    console.error(error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Error fetching complaints" });
-  }
-};
+// Define routes
+router.post("/", createComplaint);
+router.get("/", getAllComplaints);
+router.put("/:id/assign", assignComplaint);
+router.post("/:id/followup", addFollowUpNote);
+router.put("/:id/status", updateComplaintStatus);
+
+export default router;
