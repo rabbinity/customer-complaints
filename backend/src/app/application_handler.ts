@@ -12,6 +12,7 @@ const router = Router();
  * Also accepts an optional "image" string.
  */
 const createComplaint = async (req: Request, res: Response) => {
+  console.log(req.body)
   try {
     const { userId, subject, description, productName, image } = req.body;
     const finalSubject = productName ? `${subject} - Product: ${productName}` : subject;
@@ -277,7 +278,7 @@ const updateComplaintStatus = async (req: Request, res: Response) => {
 };
 
 // Define routes
-router.post("/", createComplaint);
+router.post("/createcomplaint", createComplaint);
 router.get("/", getAllComplaints);
 router.put("/:id/assign", assignComplaint);
 router.post("/:id/followup", addFollowUpNote);

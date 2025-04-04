@@ -5,8 +5,8 @@ import { Input } from '../components/Input';
 import { AuthButton } from '../components/Authbuttonx';
 import { API_URL } from '../config';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { userStates, authState } from '../atoms'; // Import atoms from atoms.js
-import axios from 'axios'; // Import axios
+import { userStates, authState } from '../atoms';
+import axios from 'axios';
 
 export const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -15,10 +15,9 @@ export const Login = () => {
   const [loading, setLoading] = useState(false); 
   const setUser = useSetRecoilState(userStates);
   const setAuthStatus = useSetRecoilState(authState);
-  const isAuthenticated = useRecoilValue(authState); // Get current auth status
+  const isAuthenticated = useRecoilValue(authState);
   const navigate = useNavigate();
 
-  // Effect to redirect when auth status changes
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -31,22 +30,19 @@ export const Login = () => {
     setLoading(true);
   
     try {
-      // Make request using axios instead of fetch
       const response = await axios.post(`${API_URL}/api/user/login`, formData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
   
-      // Handle success response
       const userData = response.data;
   
-      // Set all the user data in Recoil state
       setUser({
-        userId: userData.userId || userData.id,
+        userId: userData.userId,
         username: userData.username,
-        lastame: userData.lastame,
-        midlename: userData.midlename,
+        lastName: userData.lastName,
+        middleName: userData.middleName,
         email: userData.email,
         phoneNumber: userData.phoneNumber,
         role: userData.role,
@@ -58,27 +54,23 @@ export const Login = () => {
         dateOfBirth: userData.dateOfBirth,
         gender: userData.gender,
         emergencyContact: userData.emergencyContact,
-        nrc_card_id: userData.nrc_card_id
+        nrc_card_id: userData.nrc_card_id,
+        storeIds: userData.storeIds,
+        warehouseIds: userData.warehouseIds
       });
   
-      // Set auth status to true after successful login
-      // The useEffect will handle navigation once this state changes
       setAuthStatus(true);
     } catch (err) {
-      // Handle error
       if (err.response) {
-        // The request was made and the server responded with an error status code
         setError(err.response.data.message || JSON.stringify(err.response.data));
       } else if (err.request) {
-        // The request was made but no response was received
         setError('No response received from server. Please try again later.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError('Error: ' + err.message);
       }
-      setAuthStatus(false); // In case of error, set auth status to false
+      setAuthStatus(false);
     } finally {
-      setLoading(false); // Reset loading state after request is complete
+      setLoading(false);
     }
   };
   
@@ -134,10 +126,7 @@ export const Login = () => {
 
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a
-                  href="/forgot-password"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
+                <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                   Forgot your password?
                 </a>
               </div>
@@ -153,11 +142,8 @@ export const Login = () => {
 
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a
-                  href="/register"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  don&apos;t have account ? register now
+                <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                  Don&apos;t have an account? Register now
                 </a>
               </div>
             </div>

@@ -30,7 +30,7 @@ export const userRegisterController = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hash(password, 10);
-    const verificationToken = generateOTP(); // Using the same OTP generator
+    const verificationToken = generateOTP(); 
 
     const user = await prisma.user.create({
       data: {

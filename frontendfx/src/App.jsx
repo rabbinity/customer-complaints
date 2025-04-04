@@ -1,100 +1,71 @@
-import  { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import CreateComplaint from '../src/app/components/CreateComplaint';
-import ComplaintsList from '../src/app/components/ComplaintsList';
-import ComplaintDetail from '../src/app/components/ComplaintDetail';
-import { RecoilRoot, useRecoilState } from 'recoil';
-import { userStates } from './atoms';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { RecoilRoot } from 'recoil';
+import Register from './auth/Register.jsx';
+import { ForgotPassword } from './auth/Forgot_password.jsx';
+import { Login } from './auth/Login.jsx';
+import { ProfileUpdate } from './auth/Profilemanagement.jsx';
+import UpdatePassword from './auth/Update_password.jsx';
+import EmailVerification from './auth/EmailVerification.jsx';
+import NotFound from "./auth/NotFound.jsx";
 
-const MainApp = () => {
-  const [user, setUser] = useRecoilState(userStates);
+import Sidebar from "./app/components/common/Sidebar.jsx";
+import OverviewPage from "./app/pages/OverviewPage.jsx";
+import UsersPage from "./app/pages/UsersPage";
+import SettingsPage from "./app/pages/SettingsPage";
+import { Outlet } from 'react-router-dom';
+import MobileWarningPopup from './app/components/common/mboileView.jsx';
+import ComplaintsPage from './app/pages/ComplaintsPage.jsx';
+import FollowUpsPage from './app/pages/FollowUpsPage.jsx';
+import ComplaintDetailsPage from './app/pages/ComplaintDetailsPage.jsx';
 
-  useEffect(() => {
-    if (!user.userId) {
-      setUser({
-        userId: 1,
-        username: 'johndoe',
-        role: 'user',
-        lastame: null,
-        midlename: null,
-        email: null,
-        phoneNumber: null,
-        group: null,
-        token: null,
-        isEmailVerified: null,
-        bloodGroup: null,
-        address: null,
-        dateOfBirth: null,
-        gender: null,
-        emergencyContact: null,
-        nrc_card_id: null,
-      });
-    }
-  }, [user, setUser]);
-
-  const toggleUserRole = () => {
-    setUser((prev) => ({
-      ...prev,
-      role: prev.role === 'admin' ? 'user' : 'admin',
-    }));
-  };
-
-  const isAdmin = user.role === 'admin';
-
+function Layout() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-100">
-        <nav className="bg-white shadow-md">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex justify-between h-16">
-              <div className="flex">
-                <div className="flex-shrink-0 flex items-center">
-                  <span className="text-xl font-bold text-blue-600">Complaint System</span>
-                </div>
-                <div className="ml-10 flex items-center space-x-4">
-                  <Link to="/" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
-                    Dashboard
-                  </Link>
-                  <Link to="/complaints" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
-                    Complaints
-                  </Link>
-                  <Link to="/create" className="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
-                    New Complaint
-                  </Link>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-4">
-                  Welcome, {user.username} ({isAdmin ? 'Admin' : 'User'})
-                </span>
-                <button 
-                  onClick={toggleUserRole}
-                  className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition-colors text-sm"
-                >
-                  Switch to {isAdmin ? 'User' : 'Admin'} Role
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
-
-        <main className="max-w-6xl mx-auto px-4 py-6">
-          <Routes>
-            <Route path="/" element={<Navigate to="/complaints" />} />
-            <Route path="/complaints" element={<ComplaintsList />} />
-            <Route path="/create" element={<CreateComplaint />} />
-            <Route path="/complaints/:id" element={<ComplaintDetail />} />
-          </Routes>
-        </main>
+    <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 -z-50">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
+        <div className="absolute inset-0 backdrop-blur-sm" />
       </div>
-    </Router>
-  );
-};
+      
+      {/* Sidebar */}
+      <MobileWarningPopup />
+      <Sidebar />
 
-const App = () => (
-  <RecoilRoot>
-    <MainApp />
-  </RecoilRoot>
-);
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4">
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <RecoilRoot>
+      <BrowserRouter>
+        <Routes>
+          {/* Auth routes */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update/password" element={<UpdatePassword />} />
+          <Route path="/verify/email/:token" element={<EmailVerification />} />
+
+          {/* Dashboard Layout with Sidebar */}
+          <Route path="/" element={<Layout />}>
+            <Route index element={<OverviewPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="complaints" element={<ComplaintsPage />} />
+            <Route path="follow-ups" element={<FollowUpsPage />} />
+            <Route path="complaints/:id" element={<ComplaintDetailsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="profile" element={<ProfileUpdate />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </RecoilRoot>
+  );
+}
 
 export default App;

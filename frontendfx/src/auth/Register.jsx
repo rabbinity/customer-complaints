@@ -12,7 +12,7 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     phoneNumber: '',
-    role: 'STOREMANAGER' 
+    role: 'STAFF' 
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -23,45 +23,47 @@ const Register = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+  
+   
+  
 
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
+     // Basic validation
+     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
     setIsLoading(true);
     try {
       const { username, email, password, phoneNumber, role } = formData;
-      const response = await axios.post( `${API_URL}/api/user/register`, {
+      const response = await axios.post(`${API_URL}/api/user/register`, {
         username,
         email,
         password,
         phoneNumber,
         role
       });
-
-      setSuccess('Registration successful! Please check your email to verify your account.');
-      
-      // Navigate to verification page with email in query params
+  
+      setSuccess(response.data?.message); 
       setTimeout(() => {
-        // navigate(`/verify-email?email=${encodeURIComponent(email)}`);
         navigate(`/login`);
       }, 3000);
     } catch (error) {
       console.error('Registration error:', error);
-      setError(
-        error.response?.data || 
-        'Registration failed. Please try again later.'
-      );
+      setError(error.response?.data?.message||
+        'Registration failed. Please try again later.'); 
     } finally {
       setIsLoading(false);
     }
   };
+  
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -196,8 +198,8 @@ const Register = () => {
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               disabled={isLoading}
             >
-              <option value="STOREMANAGER">User</option>
-              <option value="ADMIN">Admin</option>
+              <option value="STAFF">User</option>
+              <option value="STAFF">Admin</option>
             </select>
           </div>
 

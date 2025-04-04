@@ -8,41 +8,51 @@ import { API_URL } from '../../config';
 const ProfileUpdateModal = ({ isOpen, onClose }) => {
   const [userState, setUserState] = useRecoilState(userStates);
   const [formData, setFormData] = useState({
+    userId: '',
     username: '',
     email: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
     phoneNumber: '',
     bloodGroup: '',
     address: '',
     dateOfBirth: '',
     gender: '',
-    emergencyContact: ''
+    emergencyContact: '',
+    profilePicture: '',
+    bio: '',
+    location: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Blood group options
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-  
-  // Gender options
-  const genderOptions = ['Male', 'Female', 'Other', 'Prefer not to say'];
+  const genderOptions = ['Male', 'Female', 'Prefer not to say'];
 
   useEffect(() => {
     if (isOpen && userState) {
-      // Format date for input field if it exists
       const formattedDate = userState.dateOfBirth 
         ? new Date(userState.dateOfBirth).toISOString().split('T')[0]
         : '';
-        
+
       setFormData({
+        userId: userState.userId || '',
         username: userState.username || '',
         email: userState.email || '',
+        // firstName: userState.firstName || '',
+        middleName: userState.middleName || '',
+        lastName: userState.lastName || '',
         phoneNumber: userState.phoneNumber || '',
         bloodGroup: userState.bloodGroup || '',
         address: userState.address || '',
         dateOfBirth: formattedDate,
         gender: userState.gender || '',
-        emergencyContact: userState.emergencyContact || ''
+        emergencyContact: userState.emergencyContact || '',
+        profilePicture: userState.profilePicture || '',
+        bio: userState.bio || '',
+        location: userState.location || ''
       });
     }
   }, [isOpen, userState]);
@@ -62,37 +72,24 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
     setSuccessMessage('');
 
     try {
-      // Pass userId using userState.id as expected by the backend
-      const payload = {
-        ...formData,
-        userId: userState.id
-      };
+      console.log('Sending payload:', formData);
 
-      console.log('Sending payload:', payload); // Debug log
-
-      const response = await axios({
-        method: 'PATCH',
-        url: `${API_URL}/api/user/profile/update`,
-        data: payload,
+      const response = await axios.patch(`${API_URL}/api/user/profile/update`, formData, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userState.token}` // Token is preserved as required
+          'Authorization': `Bearer ${userState.token}`
         }
       });
-      
-      // Merge the updated user data from the backend into the state
+
       setUserState(prev => ({
         ...prev,
         ...response.data.user
       }));
 
       setSuccessMessage(response.data.message);
-      
-      // Close modal after a short delay to display success message
       setTimeout(() => {
         onClose();
       }, 2000);
-
     } catch (err) {
       console.error('Profile update error:', err);
       setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
@@ -117,6 +114,21 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* User ID (Read-Only) */}
+          <div>
+            <label htmlFor="userId" className="block text-sm font-medium text-gray-300">
+              User ID
+            </label>
+            <input
+              type="text"
+              id="userId"
+              name="userId"
+              value={formData.userId || ''}
+              disabled
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-400 cursor-not-allowed"
+            />
+          </div>
+
           {/* Username */}
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-300">
@@ -147,11 +159,96 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
               className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             />
-            {formData.email !== userState.email && (
-              <p className="text-yellow-400 text-xs mt-1">
-                You will need to verify your new email address after updating
-              </p>
-            )}
+          </div>
+
+          {/* First Name
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-300">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div> */}
+
+          {/* Middle Name */}
+          <div>
+            <label htmlFor="middleName" className="block text-sm font-medium text-gray-300">
+              Middle Name
+            </label>
+            <input
+              type="text"
+              id="middleName"
+              name="middleName"
+              value={formData.middleName}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Profile Picture */}
+          <div>
+            <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-300">
+              Profile Picture URL
+            </label>
+            <input
+              type="url"
+              id="profilePicture"
+              name="profilePicture"
+              value={formData.profilePicture}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label htmlFor="bio" className="block text-sm font-medium text-gray-300">
+              Bio
+            </label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              rows="3"
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-300">
+              Location
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
           {/* Phone Number */}
@@ -176,7 +273,7 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
             </label>
             <select
               id="bloodGroup"
-              name="bloodGroup" 
+              name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -186,6 +283,21 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
                 <option key={group} value={group}>{group}</option>
               ))}
             </select>
+          </div>
+
+          {/* Address */}
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-300">
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
           {/* Date of Birth */}
@@ -222,21 +334,6 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
             </select>
           </div>
 
-          {/* Address */}
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-300">
-              Address
-            </label>
-            <textarea
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
           {/* Emergency Contact */}
           <div>
             <label htmlFor="emergencyContact" className="block text-sm font-medium text-gray-300">
@@ -253,33 +350,17 @@ const ProfileUpdateModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Error Message */}
-          {error && (
-            <div className="text-red-500 text-sm py-2">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-500 text-sm py-2">{error}</div>}
 
           {/* Success Message */}
-          {successMessage && (
-            <div className="text-green-500 text-sm py-2">
-              {successMessage}
-            </div>
-          )}
+          {successMessage && <div className="text-green-500 text-sm py-2">{successMessage}</div>}
 
           {/* Submit Button */}
           <div className="flex justify-end pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mr-2 px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700 focus:outline-none"
-            >
+            <button type="button" onClick={onClose} className="mr-2 px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700">
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white focus:outline-none disabled:opacity-50"
-            >
+            <button type="submit" disabled={isLoading} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white disabled:opacity-50">
               {isLoading ? 'Updating...' : 'Update Profile'}
             </button>
           </div>

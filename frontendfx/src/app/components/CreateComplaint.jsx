@@ -20,7 +20,7 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      await axios.post(`${API_URL}/complaints`, {
+      await axios.post(`${API_URL}/api/A/createcomplaint`, {
         userId,
         subject,
         description,

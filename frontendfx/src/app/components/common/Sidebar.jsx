@@ -1,156 +1,123 @@
-import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { userStates } from '../../../atoms';
+import { BarChart2, ClipboardList, Menu, Settings, Users, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { authState, userStates } from '../../../atoms';
 
-const Sidebar = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useRecoilState(userStates);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(false);
-  
-  // Handle window resize to detect mobile view
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    
-    // Set initial state
-    handleResize();
-    
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-    
-    // Clean up
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-  
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-  
-  const isStaff = user?.role === 'staff' || user?.role === 'admin';
-  
-  // Code-inspired logo component
-  const CodeLogo = () => (
-    <div className="flex items-center mb-2">
-      <div className="mr-2 text-xl font-bold text-blue-600 font-mono">
-        &lt;/&gt;
-      </div>
-      <span className="text-xl font-medium text-gray-900">WebIzze</span>
-    </div>
-  );
-  
-  // Mobile menu burger button
-  const MobileMenuButton = () => (
-    <button 
-      onClick={toggleMobileMenu}
-      className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
-      aria-label="Toggle menu"
-    >
-      <div className={`w-6 h-0.5 bg-gray-900 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
-      <div className={`w-6 h-0.5 bg-gray-900 my-1.5 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}></div>
-      <div className={`w-6 h-0.5 bg-gray-900 transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
-    </button>
-  );
-  
-  return (
-    <>
-      {/* Mobile Menu Button */}
-      <MobileMenuButton />
-      
-      {/* Sidebar Container - adjusts based on screen size and menu state */}
-      <div 
-        className={`
-          ${isMobileView ? 'fixed z-40 top-0 left-0 h-full shadow-lg' : 'h-full'} 
-          ${isMobileView && !isMobileMenuOpen ? '-translate-x-full' : 'translate-x-0'} 
-          w-64 flex flex-col ${isStaff ? 'bg-gray-50' : 'bg-white'} border-r border-gray-200
-          transition-transform duration-300 ease-in-out
-        `}
-      >
-        {/* Sidebar Header */}
-        <div className="p-6">
-          <CodeLogo />
-          <h1 className="text-lg font-medium text-gray-900">
-            {isStaff ? 'Complaint Manager' : 'Complaint Portal'}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {isStaff ? 'Staff Portal' : 'Customer Dashboard'}
-          </p>
-        </div>
-        
-        {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-1 px-3">
-            {isStaff ? (
-              <>
-                <SidebarLink to="/staff" label="Dashboard" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/staff/complaints" label="Complaints" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/staff/users" label="Users" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/staff/settings" label="Settings" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/staff/profile" label="Profile" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-              </>
-            ) : (
-              <>
-                <SidebarLink to="/" end label="Dashboard" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/my-complaints" label="My Complaints" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/new-complaint" label="New Complaint" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-                <SidebarLink to="/profile" label="Profile" onClick={() => isMobileView && setIsMobileMenuOpen(false)} />
-              </>
-            )}
-          </ul>
-        </div>
-        
-        {/* Logout Button */}
-        <div className="p-6 border-t border-gray-200">
-          <button
-            onClick={handleLogout}
-            className="flex items-center justify-center w-full py-2 px-4 bg-gray-100 text-gray-800 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors duration-200"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-      
-      {/* Backdrop overlay for mobile */}
-      {isMobileView && isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-25 z-30"
-          onClick={() => setIsMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-    </>
-  );
+const ROLE_PERMISSIONS = {
+  CUSTOMER: ["Overview", "Complaints"],
+  ADMIN: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
+  INSPECTOR: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
+  STAFF: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
 };
 
-// Reusable Sidebar Link Component
-// eslint-disable-next-line react/prop-types
-const SidebarLink = ({ to, label, onClick }) => (
-  <li>
-    <NavLink
-      to={to}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-          isActive 
-            ? 'bg-gray-100 text-blue-600' 
-            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-        }`
-      }
+const SIDEBAR_ITEMS = [
+  { name: "Overview", icon: BarChart2, color: "#6366f1", href: "/" },
+  { name: "Complaints", icon: ClipboardList, color: "#F97316", href: "/complaints" },
+  { name: "Follow-Ups", icon: MessageSquare, color: "#3B82F6", href: "/follow-ups" },
+  { name: "Users", icon: Users, color: "#EC4899", href: "/users" },
+  { name: "Settings", icon: Settings, color: "#6EE7B7", href: "/settings" },
+];
+
+const Sidebar = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const user = useRecoilValue(userStates);
+  const setAuth = useSetRecoilState(authState);
+  const setUser = useSetRecoilState(userStates);
+  const isAuthenticated = useRecoilValue(authState);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setAuth(false);
+    navigate("/login");
+  };
+
+  const getUserMenuItems = () => {
+    if (!user || !user.role) return [];
+    const userRole = user.role.toUpperCase();
+    const allowedItems = ROLE_PERMISSIONS[userRole] || ["Overview"];
+    return SIDEBAR_ITEMS.filter(item => allowedItems.includes(item.name));
+  };
+
+  const accessibleMenuItems = getUserMenuItems();
+
+  return (
+    <motion.div
+      className="relative z-10 transition-all duration-300 ease-in-out flex-shrink-0"
+      animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      {label}
-    </NavLink>
-  </li>
-);
+      <div className="min-h-screen bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 rounded-full hover:bg-gray-700 transition-colors max-w-fit"
+        >
+          <Menu size={24} />
+        </motion.button>
+
+        <nav className="mt-4 flex-grow">
+          {accessibleMenuItems.map((item) => (
+            <Link key={item.href} to={item.href}>
+              <motion.div className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors">
+                <item.icon size={20} style={{ color: item.color, minWidth: "20px" }} />
+                <AnimatePresence>
+                  {isSidebarOpen && (
+                    <motion.span
+                      className="ml-4 whitespace-nowrap"
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.2, delay: 0.3 }}
+                    >
+                      {item.name}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </Link>
+          ))}
+        </nav>
+
+        {user && (
+          <div className="mt-auto p-4 border-t border-gray-700">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-lg">
+                <Users size={20} />
+              </div>
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <p className="text-white font-medium">{user.username}</p>
+                    <p className="text-gray-400 text-sm">{user.role}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white p-2 rounded-md text-sm"
+            >
+              {isSidebarOpen ? "Logout" : ""}
+            </button>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 export default Sidebar;
