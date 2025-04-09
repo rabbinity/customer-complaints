@@ -1,4 +1,4 @@
-import { BarChart2, ClipboardList, Menu, Settings, Users, MessageSquare } from "lucide-react";
+import { BarChart2, ClipboardList, Menu, PhoneCall, Settings, Users, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { authState, userStates } from '../../../atoms';
 
 const ROLE_PERMISSIONS = {
-  CUSTOMER: ["Overview", "Complaints"],
+  CUSTOMER: ["Overview", "Complaints", "CreateComplaint"],
   ADMIN: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
   INSPECTOR: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
   STAFF: ["Overview", "Complaints", "Follow-Ups", "Users", "Settings"],
@@ -17,6 +17,7 @@ const SIDEBAR_ITEMS = [
   { name: "Complaints", icon: ClipboardList, color: "#F97316", href: "/complaints" },
   { name: "Follow-Ups", icon: MessageSquare, color: "#3B82F6", href: "/follow-ups" },
   { name: "Users", icon: Users, color: "#EC4899", href: "/users" },
+  { name: "CreateComplaint", icon: PhoneCall, color: "#EC4899", href: "/CreateComplaint" },
   { name: "Settings", icon: Settings, color: "#6EE7B7", href: "/settings" },
 ];
 

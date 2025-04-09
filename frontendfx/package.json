@@ -12,13 +12,14 @@
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.13.0",
     "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.2.0",
-    "recoil": "^0.7.7",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "recoil": "^0.7.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

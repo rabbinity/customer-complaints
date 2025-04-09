@@ -6,6 +6,7 @@ import logger from "morgan";
 // loute imports 😭
 import userRouter from "./User/router";
 import router from "./app/application_handler";
+import chatrouter from "./app/chart";
 
 
 const app: Express = express();
@@ -30,6 +31,7 @@ app.options('*', cors(corsOptions));  // Handle OPTIONS for all routes
 // routes 😂
 app.use("/api/user", userRouter);
 app.use("/api/A", router);
+app.use( chatrouter);
 
 app.get("/", (req: Request, res: Response) => {
   console.log(req.body);

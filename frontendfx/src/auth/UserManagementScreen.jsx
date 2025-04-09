@@ -130,7 +130,7 @@ const UserManagementScreen = () => {
           {/* Role Filter Dropdown */}
           <div className="relative">
             <select
-              className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
             >
@@ -148,7 +148,7 @@ const UserManagementScreen = () => {
           {/* Verification Filter Dropdown */}
           <div className="relative">
             <select
-              className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={verificationFilter}
               onChange={(e) => setVerificationFilter(e.target.value)}
             >
@@ -177,7 +177,7 @@ const UserManagementScreen = () => {
       </div>
       
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
+      <div className="overflow-x-auto bg-gray-800 rounded-lg shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -231,7 +231,7 @@ const UserManagementScreen = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-800 divide-y divide-gray-200">
             {isLoading ? (
               <tr>
                 <td colSpan="6" className="px-6 py-4 text-center">

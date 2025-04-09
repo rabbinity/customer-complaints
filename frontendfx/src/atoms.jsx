@@ -26,7 +26,7 @@ export const userStates = atom({
     midlename: null,
     email: null,
     phoneNumber: null,
-    role: null,
+    role: "CUSTOMER",
     group: null,
     token: null,
     isEmailVerified: null,

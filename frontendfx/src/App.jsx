@@ -9,7 +9,6 @@ import EmailVerification from './auth/EmailVerification.jsx';
 import NotFound from "./auth/NotFound.jsx";
 
 import Sidebar from "./app/components/common/Sidebar.jsx";
-import OverviewPage from "./app/pages/OverviewPage.jsx";
 import UsersPage from "./app/pages/UsersPage";
 import SettingsPage from "./app/pages/SettingsPage";
 import { Outlet } from 'react-router-dom';
@@ -17,6 +16,7 @@ import MobileWarningPopup from './app/components/common/mboileView.jsx';
 import ComplaintsPage from './app/pages/ComplaintsPage.jsx';
 import FollowUpsPage from './app/pages/FollowUpsPage.jsx';
 import ComplaintDetailsPage from './app/pages/ComplaintDetailsPage.jsx';
+import CreateComplaint from './app/components/CreateComplaint.jsx';
 
 function Layout() {
   return (
@@ -53,13 +53,14 @@ function App() {
 
           {/* Dashboard Layout with Sidebar */}
           <Route path="/" element={<Layout />}>
-            <Route index element={<OverviewPage />} />
+            <Route index element={<ComplaintsPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="complaints" element={<ComplaintsPage />} />
             <Route path="follow-ups" element={<FollowUpsPage />} />
             <Route path="complaints/:id" element={<ComplaintDetailsPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="profile" element={<ProfileUpdate />} />
+            <Route path="profile" element={<ProfileUpdate />} /> 
+             <Route path="CreateComplaint" element={<CreateComplaint />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

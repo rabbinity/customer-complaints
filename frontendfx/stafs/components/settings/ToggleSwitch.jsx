@@ -10,7 +10,7 @@ const ToggleSwitch = ({ label, isOn, onToggle }) => {
 				onClick={onToggle}
 			>
 				<span
-					className={`inline-block size-4 transform transition-transform bg-white rounded-full 
+					className={`inline-block size-4 transform transition-transform bg-gray-800 rounded-full 
             ${isOn ? "translate-x-6" : "translate-x-1"}
             `}
 				/>

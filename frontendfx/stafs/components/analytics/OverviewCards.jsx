@@ -29,7 +29,7 @@ const OverviewCards = () => {
 
 						<div
 							className={`
-              p-3 rounded-full bg-opacity-20 ${item.change >= 0 ? "bg-green-500" : "bg-red-500"}
+              p-3 rounded-full bg-gray-800 ${item.change >= 0 ? "bg-green-500" : "bg-red-500"}
               `}
 						>
 							<item.icon className={`size-6  ${item.change >= 0 ? "text-green-500" : "text-red-500"}`} />

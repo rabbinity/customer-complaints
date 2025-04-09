@@ -1,11 +1,11 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userStates } from '../../atoms';
 import { API_URL } from '../../config';
 
 const CreateComplaint = () => {
-  const { userId,} = useRecoilValue(userStates);
+  const { userId } = useRecoilValue(userStates);
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [productName, setProductName] = useState('');
@@ -41,30 +41,30 @@ const CreateComplaint = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-4">Submit a New Complaint</h2>
+    <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-md p-6 bg-opacity-90">
+      <h2 className="text-2xl font-bold mb-4 text-white">Submit a New Complaint</h2>
 
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <div className="bg-green-100 bg-opacity-80 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
           Complaint submitted successfully!
         </div>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-100 bg-opacity-80 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="subject" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="subject" className="block text-white font-semibold mb-2">
             Subject
           </label>
           <input
             type="text"
             id="subject"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full px-3 py-2 border border-gray-300 rounded bg-white bg-opacity-80 text-black"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             required
@@ -72,25 +72,25 @@ const CreateComplaint = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="product" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="product" className="block text-white font-semibold mb-2">
             Product Name (Optional)
           </label>
           <input
             type="text"
             id="product"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full px-3 py-2 border border-gray-300 rounded bg-white bg-opacity-80 text-black"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
           />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="description" className="block text-white font-semibold mb-2">
             Description
           </label>
           <textarea
             id="description"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full px-3 py-2 border border-gray-300 rounded bg-white bg-opacity-80 text-black"
             rows="4"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -99,13 +99,13 @@ const CreateComplaint = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="image" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="image" className="block text-white font-semibold mb-2">
             Image URL (Optional)
           </label>
           <input
             type="text"
             id="image"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
+            className="w-full px-3 py-2 border border-gray-300 rounded bg-white bg-opacity-80 text-black"
             value={image}
             onChange={(e) => setImage(e.target.value)}
           />

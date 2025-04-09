@@ -80,6 +80,7 @@ const getAllComplaints = async (_req: Request, res: Response) => {
  * Assign a follow-up agent to the complaint and record the initial review note.
  * The assigned user (agent) is identified by reviewerUserId.
  * Sends an email to the complainer informing that the complaint is under review.
+ * router.put("/:id/assign", assignComplaint);
  */
 const assignComplaint = async (req: Request, res: Response) => {
   try {
@@ -279,7 +280,7 @@ const updateComplaintStatus = async (req: Request, res: Response) => {
 
 // Define routes
 router.post("/createcomplaint", createComplaint);
-router.get("/", getAllComplaints);
+router.get("/list", getAllComplaints);
 router.put("/:id/assign", assignComplaint);
 router.post("/:id/followup", addFollowUpNote);
 router.put("/:id/status", updateComplaintStatus);
